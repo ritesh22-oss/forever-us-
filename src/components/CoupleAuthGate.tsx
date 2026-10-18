@@ -200,12 +200,14 @@ export const CoupleAuthGate: React.FC<CoupleAuthGateProps> = ({
   }
 
   // 3. FRIENDLY ACCESS-DENIED PAGE (When user is signed in to Google, but not in authorized list)
-  const authorizedEmails = settings?.authorizedEmails || [
-    'riteshganguly0911@gmail.com',
-  ];
+  const defaultAllowed = ['riteshganguly0911@gmail.com', 'deepsikhanath9614@gmail.com'];
+  const authorizedEmails = settings?.authorizedEmails && settings.authorizedEmails.length > 0
+    ? settings.authorizedEmails
+    : defaultAllowed;
 
   const userEmail = (user.email || '').toLowerCase().trim();
   const isAuthorized =
+    defaultAllowed.some((email) => email.toLowerCase().trim() === userEmail) ||
     authorizedEmails.length === 0 ||
     authorizedEmails.some((email) => email.toLowerCase().trim() === userEmail);
 

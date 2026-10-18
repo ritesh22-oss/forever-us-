@@ -149,19 +149,23 @@ export default function App() {
           const data = snap.data() as CoupleSettings;
           data.relationshipStartDate = '2026-07-10';
           data.anniversaryDate = '2026-07-10';
+          const defaultEmails = ['riteshganguly0911@gmail.com', 'deepsikhanath9614@gmail.com'];
+          const existingEmails = data.authorizedEmails || [];
+          const mergedEmails = Array.from(new Set([...existingEmails, ...defaultEmails]));
+          data.authorizedEmails = mergedEmails;
           setSettings(data);
         } else {
           // Initialize default couple configuration
           const defaultSettings: CoupleSettings = {
             coupleId: 'forever-us',
             partner1Name: 'Ritesh',
-            partner2Name: 'Sweetheart',
+            partner2Name: 'Deepshika',
             anniversaryDate: '2026-07-10',
             relationshipStartDate: '2026-07-10',
             theme: 'blush',
             reducedMotion: false,
             musicEnabled: false,
-            authorizedEmails: [user.email || 'riteshganguly0911@gmail.com'],
+            authorizedEmails: ['riteshganguly0911@gmail.com', 'deepsikhanath9614@gmail.com'],
             updatedAt: new Date().toISOString(),
           };
           try {
