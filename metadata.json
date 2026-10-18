@@ -1,0 +1,6 @@
+{
+  "name": "Forever Us — Romantic Memory Vault",
+  "description": "Our private couple's digital sanctuary to securely store, organize, and revisit our photos, videos, love letters, and relationship memories forever.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

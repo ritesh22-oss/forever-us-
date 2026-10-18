@@ -1,0 +1,173 @@
+{
+  "entities": {
+    "CoupleSettings": {
+      "title": "CoupleSettings",
+      "description": "Configuration and preferences for the couple vault",
+      "type": "object",
+      "properties": {
+        "coupleId": { "type": "string", "maxLength": 64 },
+        "partner1Name": { "type": "string", "maxLength": 64 },
+        "partner2Name": { "type": "string", "maxLength": 64 },
+        "partner1Photo": { "type": "string", "maxLength": 2048 },
+        "partner2Photo": { "type": "string", "maxLength": 2048 },
+        "anniversaryDate": { "type": "string", "maxLength": 32 },
+        "relationshipStartDate": { "type": "string", "maxLength": 32 },
+        "theme": { "type": "string", "maxLength": 32, "enum": ["blush", "lavender", "cream", "midnight"] },
+        "quoteSelection": { "type": "string", "maxLength": 64 },
+        "reducedMotion": { "type": "boolean" },
+        "musicEnabled": { "type": "boolean" },
+        "authorizedEmails": { "type": "array" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["coupleId", "partner1Name", "partner2Name"]
+    },
+    "Memory": {
+      "title": "Memory",
+      "description": "An uploaded romantic photo, video, or audio memory with metadata",
+      "type": "object",
+      "properties": {
+        "memoryId": { "type": "string", "maxLength": 128 },
+        "storagePath": { "type": "string", "maxLength": 1024 },
+        "downloadUrl": { "type": "string", "maxLength": 2048 },
+        "filename": { "type": "string", "maxLength": 256 },
+        "mediaType": { "type": "string", "maxLength": 64, "enum": ["image", "video", "audio", "document"] },
+        "fileSize": { "type": "number" },
+        "uploadedAt": { "type": "string" },
+        "captureDate": { "type": "string", "maxLength": 64 },
+        "caption": { "type": "string", "maxLength": 500 },
+        "description": { "type": "string", "maxLength": 4000 },
+        "albumIds": { "type": "array" },
+        "tags": { "type": "array" },
+        "isFavorite": { "type": "boolean" },
+        "uploaderUid": { "type": "string", "maxLength": 128 },
+        "uploaderEmail": { "type": "string", "maxLength": 128 },
+        "thumbnailUrl": { "type": "string", "maxLength": 2048 },
+        "isDeleted": { "type": "boolean" },
+        "deletedAt": { "type": "string", "maxLength": 64 },
+        "locationName": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["memoryId", "storagePath", "downloadUrl", "filename", "mediaType", "uploaderUid"]
+    },
+    "Album": {
+      "title": "Album",
+      "description": "A custom memory folder or album",
+      "type": "object",
+      "properties": {
+        "albumId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "emoji": { "type": "string", "maxLength": 16 },
+        "coverUrl": { "type": "string", "maxLength": 2048 },
+        "color": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "creatorUid": { "type": "string", "maxLength": 128 },
+        "isDeleted": { "type": "boolean" }
+      },
+      "required": ["albumId", "name", "creatorUid"]
+    },
+    "LoveLetter": {
+      "title": "LoveLetter",
+      "description": "A written romantic letter, poem, or future-locked message",
+      "type": "object",
+      "properties": {
+        "letterId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "content": { "type": "string", "maxLength": 20000 },
+        "fontStyle": { "type": "string", "maxLength": 32, "enum": ["handwriting", "serif", "sans"] },
+        "tags": { "type": "array" },
+        "emoji": { "type": "string", "maxLength": 16 },
+        "photos": { "type": "array" },
+        "isFavorite": { "type": "boolean" },
+        "unlockDate": { "type": "string", "maxLength": 64 },
+        "isLockedUntilDate": { "type": "boolean" },
+        "category": { "type": "string", "maxLength": 64, "enum": ["letter", "journal", "miss_me", "future", "poem"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["letterId", "title", "content", "authorUid"]
+    },
+    "TimelineEvent": {
+      "title": "TimelineEvent",
+      "description": "A romantic milestone or memory timeline entry",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "date": { "type": "string", "maxLength": 32 },
+        "time": { "type": "string", "maxLength": 32 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "icon": { "type": "string", "maxLength": 64 },
+        "category": { "type": "string", "maxLength": 64 },
+        "mediaIds": { "type": "array" },
+        "isMilestone": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "creatorUid": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["eventId", "title", "date", "creatorUid"]
+    },
+    "BucketListItem": {
+      "title": "BucketListItem",
+      "description": "A dream, trip, or goal for the couple to do together",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "maxLength": 64 },
+        "completed": { "type": "boolean" },
+        "completedDate": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string" },
+        "creatorUid": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["itemId", "title", "creatorUid"]
+    },
+    "ReasonLove": {
+      "title": "ReasonLove",
+      "description": "One of the reasons why I love you",
+      "type": "object",
+      "properties": {
+        "reasonId": { "type": "string", "maxLength": 128 },
+        "text": { "type": "string", "maxLength": 1000 },
+        "authorName": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" },
+        "heartColor": { "type": "string", "maxLength": 32 },
+        "creatorUid": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["reasonId", "text", "creatorUid"]
+    }
+  },
+  "firestore": {
+    "/settings/{settingId}": {
+      "schema": "CoupleSettings",
+      "description": "Global space configurations and anniversary details"
+    },
+    "/memories/{memoryId}": {
+      "schema": "Memory",
+      "description": "Collection of uploaded couple media memories"
+    },
+    "/albums/{albumId}": {
+      "schema": "Album",
+      "description": "Albums and folders categorizing memories"
+    },
+    "/letters/{letterId}": {
+      "schema": "LoveLetter",
+      "description": "Love letters, diaries, and future locked notes"
+    },
+    "/timeline/{eventId}": {
+      "schema": "TimelineEvent",
+      "description": "Chronological relationship events and milestones"
+    },
+    "/bucketList/{itemId}": {
+      "schema": "BucketListItem",
+      "description": "Shared couple dreams and bucket list"
+    },
+    "/reasonsLove/{reasonId}": {
+      "schema": "ReasonLove",
+      "description": "Messages and notes in the Reasons I Love You jar"
+    }
+  }
+}

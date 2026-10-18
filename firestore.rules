@@ -1,0 +1,159 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Memory Validation
+    function isValidMemory(data) {
+      return data.keys().hasAll(['memoryId', 'storagePath', 'downloadUrl', 'filename', 'mediaType', 'uploaderUid'])
+        && data.memoryId is string && data.memoryId.size() <= 128
+        && data.storagePath is string && data.storagePath.size() <= 1024
+        && data.downloadUrl is string && data.downloadUrl.size() <= 2048
+        && data.filename is string && data.filename.size() <= 256
+        && data.mediaType is string && (data.mediaType == 'image' || data.mediaType == 'video' || data.mediaType == 'audio' || data.mediaType == 'document')
+        && data.uploaderUid == request.auth.uid
+        && (!('caption' in data) || (data.caption is string && data.caption.size() <= 500))
+        && (!('description' in data) || (data.description is string && data.description.size() <= 4000))
+        && (!('albumIds' in data) || (data.albumIds is list && data.albumIds.size() <= 50))
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 20));
+    }
+
+    // Album Validation
+    function isValidAlbum(data) {
+      return data.keys().hasAll(['albumId', 'name', 'creatorUid'])
+        && data.albumId is string && data.albumId.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 128
+        && data.creatorUid == request.auth.uid
+        && (!('description' in data) || (data.description is string && data.description.size() <= 1000))
+        && (!('emoji' in data) || (data.emoji is string && data.emoji.size() <= 16))
+        && (!('coverUrl' in data) || (data.coverUrl is string && data.coverUrl.size() <= 2048));
+    }
+
+    // Love Letter Validation
+    function isValidLetter(data) {
+      return data.keys().hasAll(['letterId', 'title', 'content', 'authorUid'])
+        && data.letterId is string && data.letterId.size() <= 128
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 256
+        && data.content is string && data.content.size() <= 20000
+        && data.authorUid == request.auth.uid
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 20))
+        && (!('photos' in data) || (data.photos is list && data.photos.size() <= 20));
+    }
+
+    // Timeline Validation
+    function isValidTimeline(data) {
+      return data.keys().hasAll(['eventId', 'title', 'date', 'creatorUid'])
+        && data.eventId is string && data.eventId.size() <= 128
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 256
+        && data.date is string && data.date.size() <= 32
+        && data.creatorUid == request.auth.uid
+        && (!('description' in data) || (data.description is string && data.description.size() <= 2000))
+        && (!('mediaIds' in data) || (data.mediaIds is list && data.mediaIds.size() <= 30));
+    }
+
+    // Bucket List Validation
+    function isValidBucket(data) {
+      return data.keys().hasAll(['itemId', 'title', 'creatorUid'])
+        && data.itemId is string && data.itemId.size() <= 128
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 256
+        && data.creatorUid == request.auth.uid
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000));
+    }
+
+    // Reasons Validation
+    function isValidReason(data) {
+      return data.keys().hasAll(['reasonId', 'text', 'creatorUid'])
+        && data.reasonId is string && data.reasonId.size() <= 128
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 1000
+        && data.creatorUid == request.auth.uid;
+    }
+
+    // Settings Validation
+    function isValidSettings(data) {
+      return data.keys().hasAll(['coupleId', 'partner1Name', 'partner2Name'])
+        && data.coupleId is string && data.coupleId.size() <= 64
+        && data.partner1Name is string && data.partner1Name.size() <= 64
+        && data.partner2Name is string && data.partner2Name.size() <= 64;
+    }
+
+    // Memories Collection
+    match /memories/{memoryId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(memoryId) && isValidMemory(incoming());
+      allow update: if isSignedIn() && isValidId(memoryId) && isValidMemory(incoming())
+        && incoming().uploaderUid == existing().uploaderUid;
+      allow delete: if isSignedIn() && isValidId(memoryId);
+    }
+
+    // Albums Collection
+    match /albums/{albumId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(albumId) && isValidAlbum(incoming());
+      allow update: if isSignedIn() && isValidId(albumId) && isValidAlbum(incoming())
+        && incoming().creatorUid == existing().creatorUid;
+      allow delete: if isSignedIn() && isValidId(albumId);
+    }
+
+    // Love Letters Collection
+    match /letters/{letterId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(letterId) && isValidLetter(incoming());
+      allow update: if isSignedIn() && isValidId(letterId) && isValidLetter(incoming())
+        && incoming().authorUid == existing().authorUid;
+      allow delete: if isSignedIn() && isValidId(letterId);
+    }
+
+    // Timeline Collection
+    match /timeline/{eventId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(eventId) && isValidTimeline(incoming());
+      allow update: if isSignedIn() && isValidId(eventId) && isValidTimeline(incoming())
+        && incoming().creatorUid == existing().creatorUid;
+      allow delete: if isSignedIn() && isValidId(eventId);
+    }
+
+    // Bucket List Collection
+    match /bucketList/{itemId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(itemId) && isValidBucket(incoming());
+      allow update: if isSignedIn() && isValidId(itemId) && isValidBucket(incoming());
+      allow delete: if isSignedIn() && isValidId(itemId);
+    }
+
+    // Reasons Love Collection
+    match /reasonsLove/{reasonId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(reasonId) && isValidReason(incoming());
+      allow update: if isSignedIn() && isValidId(reasonId) && isValidReason(incoming());
+      allow delete: if isSignedIn() && isValidId(reasonId);
+    }
+
+    // Settings Collection
+    match /settings/{settingId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(settingId) && isValidSettings(incoming());
+      allow delete: if isSignedIn() && isValidId(settingId);
+    }
+  }
+}
